@@ -4,7 +4,7 @@ body {
 canvas {
     display: block;
     margin: 0 auto;
-    background: #566569;
+    background: #ffd4d4;
 }
 .ui {
     position: absolute;
@@ -14,7 +14,7 @@ canvas {
     width: 100%;
     top: 10px;
     left: 0px;
-    color: white;
+    color: rgb(0, 0, 0);
     font-family: Arial, sans-serif;
 }
 
