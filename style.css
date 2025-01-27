@@ -1,0 +1,31 @@
+body {
+    margin: 0;
+}
+canvas {
+    display: block;
+    margin: 0 auto;
+    background: #566569;
+}
+.ui {
+    position: absolute;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    top: 10px;
+    left: 0px;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+button {
+    background-color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+}
+
+button:hover {
+    background-color: #cacaca;
+
+}
