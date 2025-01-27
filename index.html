@@ -177,25 +177,6 @@
                 // Додаємо подію для перемикача
                 this.switchControlButton.addEventListener("click", () => this.switchControlMode());
 
-                // Для управління мишею
-                this.mouseX = 0;
-                this.mouseY = 0;
-                this.isMouseDown = false;
-
-                this.canvas.addEventListener("mousemove", (e) => {
-                    const rect = this.canvas.getBoundingClientRect();
-                    this.mouseX = e.clientX - rect.left;
-                    this.mouseY = e.clientY - rect.top;
-                });
-
-                this.canvas.addEventListener("mousedown", () => {
-                    this.isMouseDown = true;
-                });
-
-                this.canvas.addEventListener("mouseup", () => {
-                    this.isMouseDown = false;
-                });
-
                 // Для сенсорного управління
                 this.joystick = document.getElementById('joystick');
                 this.stick = document.getElementById('stick');
@@ -204,7 +185,9 @@
                     startX: 0,
                     startY: 0,
                     moveX: 0,
-                    moveY: 0
+                    moveY: 0,
+                    centerX: 0,
+                    centerY: 0
                 };
 
                 // Визначаємо, чи це мобільний пристрій
@@ -213,6 +196,7 @@
                 if (this.isMobile) {
                     this.joystick.style.display = 'block';
                     this.setupTouchControls();
+                    this.player.speed = 200;
                 } else {
                     this.setupMouseControls();
                 }
@@ -232,8 +216,8 @@
                     const touch = e.touches[0];
                     const rect = this.joystick.getBoundingClientRect();
                     this.joystickData.isActive = true;
-                    this.joystickData.startX = rect.left + rect.width / 2;
-                    this.joystickData.startY = rect.top + rect.height / 2;
+                    this.joystickData.centerX = rect.left + rect.width / 2;
+                    this.joystickData.centerY = rect.top + rect.height / 2;
                     this.moveStick(touch.clientX, touch.clientY);
                 });
 
@@ -254,10 +238,10 @@
             }
 
             moveStick(clientX, clientY) {
-                const deltaX = clientX - this.joystickData.startX;
-                const deltaY = clientY - this.joystickData.startY;
+                const deltaX = clientX - this.joystickData.centerX;
+                const deltaY = clientY - this.joystickData.centerY;
                 const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                const maxDistance = 30;
+                const maxDistance = 40; // Максимальна відстань переміщення стіка
                 
                 let moveX = deltaX;
                 let moveY = deltaY;
@@ -267,10 +251,32 @@
                     moveY = (deltaY / distance) * maxDistance;
                 }
                 
-                this.stick.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                // Нормалізуємо значення для руху гравця на основі відстані
+                const normalizedDistance = Math.min(distance / maxDistance, 1);
+                this.joystickData.moveX = (moveX / maxDistance) * normalizedDistance;
+                this.joystickData.moveY = (moveY / maxDistance) * normalizedDistance;
                 
-                this.joystickData.moveX = moveX / maxDistance;
-                this.joystickData.moveY = moveY / maxDistance;
+                this.stick.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            }
+
+            setupMouseControls() {
+                this.mouseX = 0;
+                this.mouseY = 0;
+                this.isMouseDown = false;
+
+                this.canvas.addEventListener("mousemove", (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    this.mouseX = e.clientX - rect.left;
+                    this.mouseY = e.clientY - rect.top;
+                });
+
+                this.canvas.addEventListener("mousedown", () => {
+                    this.isMouseDown = true;
+                });
+
+                this.canvas.addEventListener("mouseup", () => {
+                    this.isMouseDown = false;
+                });
             }
 
             updateTimer(deltaTime) {
@@ -327,8 +333,12 @@
 
                 if (this.isMobile || this.controlMode === "Touch") {
                     if (this.joystickData.isActive) {
-                        dx = this.joystickData.moveX;
-                        dy = this.joystickData.moveY;
+                        const distanceFactor = Math.sqrt(
+                            this.joystickData.moveX * this.joystickData.moveX +
+                            this.joystickData.moveY * this.joystickData.moveY
+                        );
+                        dx = this.joystickData.moveX * distanceFactor;
+                        dy = this.joystickData.moveY * distanceFactor;
                     }
                 } else if (this.controlMode === "WASD") {
                     if (this.keys["KeyW"]) dy -= 1;
@@ -355,6 +365,7 @@
                     console.warn(`Invalid deltaTime: ${deltaTime}`);
                     return;
                 }
+                // console.log(`${dx}, ${dy}`);
 
                 this.player.x += dx * this.player.speed * (deltaTime / 1000);
                 this.player.y += dy * this.player.speed * (deltaTime / 1000);
