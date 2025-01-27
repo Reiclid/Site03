@@ -286,6 +286,8 @@
                     this.isPaused = true; // Зупиняємо гру
                     alert("Game Over!");
                 }
+                
+                this.updateTimer(deltaTime);
             }
 
             draw() {
