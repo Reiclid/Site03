@@ -18,6 +18,28 @@ canvas {
     font-family: Arial, sans-serif;
 }
 
+#joystick {
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    display: none;
+}
+#stick {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    top: 30px;
+    left: 30px;
+}
+
 button {
     background-color: #ffffff;
     border: none;
